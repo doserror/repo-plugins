@@ -16,8 +16,9 @@ import xbmcplugin
 import xbmcaddon
 import xbmc
 import inputstreamhelper
-import web_pdb
+
 from resources.lib import curiositystream as cs
+
 KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
 PROTOCOL = 'mpd'
 DRM = 'com.widevine.alpha'

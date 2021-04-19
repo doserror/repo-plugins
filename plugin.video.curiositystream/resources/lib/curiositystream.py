@@ -6,7 +6,6 @@ from math import floor
 import requests
 import xbmc
 import xbmcgui
-import web_pdb                                 
 
 class CSAuthFailed(Exception):
     def __init__(self, error_message):

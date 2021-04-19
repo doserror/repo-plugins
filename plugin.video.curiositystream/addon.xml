@@ -4,7 +4,6 @@
     <import addon="xbmc.python" version="2.26.0"/>
     <import addon="script.module.requests" version="2.22.0"/>
     <import addon="script.module.inputstreamhelper" version="0.5.2"/>
-    <import addon="script.module.web-pdb" version="1.5.6"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="main.py">
     <provides>video</provides>
