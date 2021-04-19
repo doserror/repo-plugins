@@ -6,7 +6,7 @@ from math import floor
 import requests
 import xbmc
 import xbmcgui
-
+import web_pdb                                 
 
 class CSAuthFailed(Exception):
     def __init__(self, error_message):
@@ -128,6 +128,16 @@ class CuriosityStream(object):
         ):
             # it should be still an authenticated session
             return
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; FreeBSD amd64; rv:87.0) Gecko/20100101 Firefox/87.0',
+            'Host': 'api.curiositystream.com',
+            'Origin': 'https://curiositystream.com',
+            'Referer': 'https://curiositystream.com/',
+        }
+
+        self._session.headers.update(headers)
+
         with self._auth_context():
             if not self._username or not self._password:
                 raise CSAuthFailed(
@@ -143,6 +153,7 @@ class CuriosityStream(object):
             self._session.headers.update(
                 {"x-auth-token": data["message"]["auth_token"]}
             )
+
             self._save_session()
 
     @_authenticate_and_retry_on_401
@@ -477,7 +488,9 @@ class CuriosityStream(object):
     @_authenticate_and_retry_on_401
     def media_stream_info(self, media):
         def get_media():
-            response = self._session.get("{}media/{}".format(self._base_url, media))
+	    url = "{}media/{}".format(self._base_url, media)
+	    url = url + "?encodingsNew=true&encodingsFormat=mpd"
+            response = self._session.get(url)
             response.raise_for_status()
             return response.json()
 
@@ -489,7 +502,7 @@ class CuriosityStream(object):
             "streams": [
                 encoding
                 for encoding in data["data"]["encodings"]
-                if encoding["type"] == "hd"
+                if encoding["type"] == "hd" or encoding["type"] == "HD"
             ],
             "subtitles": data["data"]["closed_captions"]
             if "closed_captions" in data["data"]

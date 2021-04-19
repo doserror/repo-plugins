@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, unicode_literals
 import functools
 from contextlib import contextmanager
 
@@ -8,11 +9,21 @@ if version_info.major > 2:
 else:
     from urlparse import parse_qsl
 
+import sys
+import xbmcplugin
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
 import xbmc
+import inputstreamhelper
+import web_pdb
 from resources.lib import curiositystream as cs
+KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
+PROTOCOL = 'mpd'
+DRM = 'com.widevine.alpha'
+MIME_TYPE = 'application/dash+xml'
+LICENSE_URL = 'https://widevine-proxy.appspot.com/proxy'
+
 
 tr = xbmcaddon.Addon().getLocalizedString
 
@@ -230,6 +241,18 @@ class Router(object):
         stream = self._cs_api.media_stream_info(media)
         play_item = xbmcgui.ListItem(path=stream["streams"][0]["master_playlist_url"])
         play_item.setSubtitles([c["file"] for c in stream["subtitles"]])
+
+        is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
+  	if KODI_VERSION_MAJOR >= 19:
+            play_item.setProperty('inputstream', is_helper.inputstream_addon)
+        else:
+            play_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
+
+	play_item.setContentLookup(False)
+        play_item.setMimeType(MIME_TYPE)
+	play_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+        play_item.setProperty('inputstream.adaptive.license_type', DRM)
+	play_item.setProperty('inputstream.adaptive.license_key', LICENSE_URL + '||R{SSM}|')
         xbmcplugin.setResolvedUrl(self._plugin_handle, True, listitem=play_item)
 
     def _change_watchlist(self, media_id, is_bookmarked, is_collection):
